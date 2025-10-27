@@ -1,84 +1,76 @@
-// src/context/GoogleAuthProvider.jsx
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-
 
 const AuthContext = createContext();
 
-// ✅ Hook to access auth anywhere
-export const useAuth = () => useContext(AuthContext);
-
-const GoogleAuthProviderInternal = ({ children }) => {
+export function GoogleAuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [justSignedIn, setJustSignedIn] = useState(false); // track fresh login
+  const [loading, setLoading] = useState(false);
 
-  // ✅ Google login
-  const login = async () => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: window.location.origin },
-      });
-      if (error) throw error;
-    } catch (err) {
-      console.error("Google sign-in failed:", err.message);
-      setLoading(false);
-    }
-  };
-
-  // ✅ Logout
-  const logout = async () => {
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-      setJustSignedIn(false);
-    } catch (err) {
-      console.error("Logout error:", err.message);
-    }
-  };
-
-  // ✅ Session initialization & listener
   useEffect(() => {
-    // initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setUser(session.user);
-      setInitialLoading(false);
-    });
+    let ignore = false;
 
-    // auth state listener
+    async function restoreSession() {
+      try {
+        // Try to get existing session from localStorage
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!ignore) {
+          setUser(session?.user ?? null);
+        }
+      } catch (err) {
+        console.warn("Session restore error:", err);
+      } finally {
+        if (!ignore) setInitialLoading(false);
+      }
+    }
+
+    restoreSession();
+
+    // Listen for login/logout changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        setUser(session.user);
-        setLoading(false);
-        setJustSignedIn(true);
-      } else if (event === "SIGNED_OUT") {
-        setUser(null);
-        setJustSignedIn(false);
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!ignore) {
+        setUser(session?.user ?? null);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      ignore = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const value = {
-    user,
-    login,
-    logout,
-    loading,
-    initialLoading,
-    justSignedIn,
-  };
+  async function login() {
+    setLoading(true);
+    try {
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin + "/dashboard",
+          scopes: "openid email profile https://www.googleapis.com/auth/drive.file",
+        },
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+  async function logout() {
+    await supabase.auth.signOut();
+    setUser(null);
+  }
 
-// ✅ Named export to match your main.jsx
-export const GoogleAuthProvider = ({ children }) => (
-  <GoogleAuthProviderInternal>{children}</GoogleAuthProviderInternal>
-);
+  return (
+    <AuthContext.Provider value={{ user, loading, initialLoading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => useContext(AuthContext);
 
