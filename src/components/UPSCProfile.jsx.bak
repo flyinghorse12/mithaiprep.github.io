@@ -1,0 +1,237 @@
+// src/components/UPSCProfile.jsx
+import React, { useEffect, useState, useRef } from "react";
+import { supabase } from "../lib/supabaseClient"; // your existing supabase export
+import {
+  getAccessToken,
+  ensureFolderPath,
+  uploadFileToDrive,
+  listFilesInFolder,
+} from "../lib/drive";
+import "../assets/scss/_upscProfile.scss"; // create styling as you like
+
+function UPSCProfile({ moduleName = "UPSC Profile", submoduleName = "" }) {
+  // You can derive module/submodule from your sidebar click route.
+  const [user, setUser] = useState(null);
+  const [filesInFolder, setFilesInFolder] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const fileRef = useRef();
+  const [currentFolderId, setCurrentFolderId] = useState(null);
+  const [pathString, setPathString] = useState("");
+  const [selectedFileId, setSelectedFileId] = useState("");
+  const [statusMsg, setStatusMsg] = useState("");
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data?.user ?? null);
+      // if you use older supabase versions: const user = supabase.auth.user();
+    });
+  }, []);
+
+  // compute folder path array for drive: top-level "Mithaiprep" then module then submodule
+  function computePathArray(moduleNameProp, submoduleNameProp) {
+    const arr = ["Mithaiprep", moduleNameProp || "UPSC Profile"];
+    if (submoduleNameProp) arr.push(submoduleNameProp);
+    return arr;
+  }
+
+  async function ensureFolderAndLoadFiles(moduleNameProp = moduleName, submoduleNameProp = submoduleName) {
+    setLoading(true);
+    try {
+      const accessToken = await getAccessToken(supabase);
+      if (!accessToken) throw new Error("No Google access token available. Login via Google first.");
+
+      const pathArray = computePathArray(moduleNameProp, submoduleNameProp);
+      const { id: folderId, path } = await ensureFolderPath(accessToken, pathArray);
+      setCurrentFolderId(folderId);
+      setPathString(path);
+
+      // list files in folder
+      const files = await listFilesInFolder(accessToken, folderId);
+      setFilesInFolder(files);
+      setStatusMsg(`Loaded ${files.length} file(s) in ${path}`);
+    } catch (err) {
+      console.error("ensureFolderAndLoadFiles err", err);
+      setStatusMsg("Error: " + (err.message || err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (user) {
+      // nothing automatic — wait for user to click "Load" or on mount load default
+      ensureFolderAndLoadFiles();
+    }
+  }, [user]);
+
+  // Upload handler
+  async function handleUpload(e) {
+    e.preventDefault();
+    const file = fileRef.current.files[0];
+    if (!file) {
+      setStatusMsg("Select a file first.");
+      return;
+    }
+    setLoading(true);
+    setStatusMsg("Uploading...");
+    try {
+      const accessToken = await getAccessToken(supabase);
+      if (!accessToken) throw new Error("No Google access token available.");
+
+      const pathArray = computePathArray(moduleName, submoduleName);
+      const { id: folderId, path } = await ensureFolderPath(accessToken, pathArray);
+
+      const uploadRes = await uploadFileToDrive(accessToken, file, folderId, (p) => {
+        // optional progress
+      });
+
+      // save metadata to supabase
+      const { data, error } = await supabase
+        .from("file_metadata")
+        .insert([
+          {
+            user_id: user.id,
+            module_name: moduleName,
+            submodule_name: submoduleName || null,
+            file_name: uploadRes.name,
+            file_mime: uploadRes.mimeType,
+            drive_file_id: uploadRes.id,
+            drive_file_size: uploadRes.size ? Number(uploadRes.size) : null,
+            drive_web_view_link: uploadRes.webViewLink ?? null,
+            drive_parent_path: path,
+          },
+        ])
+        .select();
+
+      if (error) {
+        console.error("Supabase insert error", error);
+        setStatusMsg("Uploaded to Drive but failed to save metadata: " + error.message);
+      } else {
+        setStatusMsg("Upload complete and metadata saved.");
+      }
+
+      // refresh file list
+      await ensureFolderAndLoadFiles(moduleName, submoduleName);
+    } catch (err) {
+      console.error("upload err", err);
+      setStatusMsg("Upload error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // List metadata from supabase for the user for current module/submodule (optional)
+  async function fetchMetadataList() {
+    try {
+      const { data, error } = await supabase
+        .from("file_metadata")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("module_name", moduleName)
+        .eq("submodule_name", submoduleName || null)
+        .order("inserted_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error("fetchMetadataList", err);
+      return [];
+    }
+  }
+
+  // view a file in new tab securely by fetching as blob (authorized)
+  async function viewFileDrive(fileMeta) {
+    try {
+      setLoading(true);
+      setStatusMsg("Fetching file preview...");
+      const accessToken = await getAccessToken(supabase);
+      if (!accessToken) throw new Error("No Google access token available.");
+
+      const downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileMeta.id}?alt=media`;
+      const res = await fetch(downloadUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Failed to fetch file: ${res.status} ${text}`);
+      }
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, "_blank");
+      setStatusMsg("");
+    } catch (err) {
+      console.error("viewFileDrive err", err);
+      setStatusMsg("Could not open file: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // render
+  return (
+    <div className="upsc-profile-card">
+      <h2>UPSC Profile</h2>
+      <p>
+        This section stores UPSC resources. Files you upload here are saved to your Google Drive
+        under a folder created for this app (Mithaiprep &rarr; Module &rarr; Submodule).
+      </p>
+
+      <div className="upsc-actions">
+        <div className="info-row">
+          <strong>Drive path:</strong> {pathString || "—"}
+        </div>
+
+        <div className="upload-row">
+          <input ref={fileRef} type="file" accept="application/pdf,image/*" />
+          <button onClick={handleUpload} disabled={loading}>Upload</button>
+          <button onClick={() => ensureFolderAndLoadFiles()} disabled={loading}>Refresh files</button>
+        </div>
+
+        <div className="files-list-row">
+          <label>Files in this folder:</label>
+          <select
+            value={selectedFileId}
+            onChange={(e) => setSelectedFileId(e.target.value)}
+          >
+            <option value="">-- select file --</option>
+            {filesInFolder.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name} ({f.mimeType || "file"})
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={async () => {
+              if (!selectedFileId) return setStatusMsg("Select a file first");
+              const meta = filesInFolder.find((x) => x.id === selectedFileId);
+              if (!meta) return setStatusMsg("File metadata missing");
+              await viewFileDrive(meta);
+            }}
+            disabled={loading || !selectedFileId}
+          >
+            View
+          </button>
+        </div>
+
+        <div className="status-row">
+          <small>{statusMsg}</small>
+        </div>
+      </div>
+
+      <hr />
+
+      <div className="upsc-info">
+        <h3>About UPSC</h3>
+        <p>
+          UPSC (Union Public Service Commission) is India’s central recruiting agency for
+          administrative and civil services. You can add notes, PDFs and reference materials here
+          to keep them stored and accessible only to you.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default UPSCProfile;
+

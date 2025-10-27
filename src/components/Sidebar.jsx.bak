@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ADD THIS IMPORT
 import "../assets/scss/_sidebar.scss";
 import {
   FaHome,
@@ -18,9 +17,8 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "../context/GoogleAuthProvider";
 
-export default function Sidebar({ userName = "Aspirant" }) {
+export default function Sidebar({ userName = "Aspirant", setActiveModule }) {
   const { logout } = useAuth();
-  const navigate = useNavigate(); // ADD THIS
   const [collapsed, setCollapsed] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const [openSubmenu, setOpenSubmenu] = useState(null);
@@ -39,19 +37,7 @@ export default function Sidebar({ userName = "Aspirant" }) {
     }
   };
 
-  // ADD THIS FUNCTION
-  const handleNavigation = (id) => {
-    const routes = {
-      profile: "/dashboard/upsc-profile",
-      planner: "/dashboard/planner",
-      others: "/dashboard/others",
-      // Add more routes as needed
-    };
-    if (routes[id]) {
-      navigate(routes[id]);
-    }
-  };
-
+  // 🧩 Smart icon assignment
   const getIconForTitle = (title) => {
     const t = title.toLowerCase();
     if (t.includes("profile")) return <FaUser />;
@@ -65,6 +51,7 @@ export default function Sidebar({ userName = "Aspirant" }) {
     return <FaEllipsisH />;
   };
 
+  // ✅ Full Menu Structure Restored
   const menuStructure = [
     { id: "profile", title: "UPSC Profile" },
     { id: "planner", title: "Study Planner" },
@@ -168,10 +155,12 @@ export default function Sidebar({ userName = "Aspirant" }) {
 
   return (
     <>
+      {/* Sidebar Toggle */}
       <button className="toggle-btn" onClick={toggleSidebar}>
         {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
       </button>
 
+      {/* Sidebar Container */}
       <nav className={`sidebar ${collapsed ? "collapsed" : ""}`}>
         <div className="logo-area user-greeting">
           <div className="welcome-text">
@@ -181,6 +170,7 @@ export default function Sidebar({ userName = "Aspirant" }) {
           <small className="text-muted">Be ready for UPSC 💪</small>
         </div>
 
+        {/* MENU LIST */}
         <div className="menu">
           {menuStructure.map((menu) => (
             <div key={menu.id}>
@@ -188,7 +178,7 @@ export default function Sidebar({ userName = "Aspirant" }) {
                 className={`sidebar-link ${openMenu === menu.id ? "active" : ""}`}
                 onClick={() => {
                   if (menu.children) handleMenuClick(menu.id);
-                  else handleNavigation(menu.id); // CHANGED THIS LINE
+                  else setActiveModule(menu.id);
                 }}
               >
                 {getIconForTitle(menu.title)}
@@ -204,7 +194,7 @@ export default function Sidebar({ userName = "Aspirant" }) {
                         className={`sidebar-link ${openSubmenu === sub.id ? "active" : ""}`}
                         onClick={() => {
                           if (sub.children) handleSubmenuClick(sub.id);
-                          else handleNavigation(sub.id); // CHANGED THIS LINE
+                          else setActiveModule(sub.id);
                         }}
                       >
                         {getIconForTitle(sub.title)}
@@ -218,7 +208,7 @@ export default function Sidebar({ userName = "Aspirant" }) {
                             <div
                               key={child.id}
                               className="sidebar-link"
-                              onClick={() => handleNavigation(child.id)} // CHANGED THIS LINE
+                              onClick={() => setActiveModule(child.id)}
                             >
                               {getIconForTitle(child.title)}
                               <span>{child.title}</span>
@@ -234,6 +224,7 @@ export default function Sidebar({ userName = "Aspirant" }) {
           ))}
         </div>
 
+        {/* PROFILE + LOGOUT */}
         <div className="profile-section">
           <img src="https://i.pravatar.cc/60?img=15" alt="Profile" />
           <div className="profile-info">
@@ -248,3 +239,4 @@ export default function Sidebar({ userName = "Aspirant" }) {
     </>
   );
 }
+
