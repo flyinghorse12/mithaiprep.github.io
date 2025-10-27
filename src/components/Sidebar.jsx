@@ -18,13 +18,19 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "../context/GoogleAuthProvider";
 
-export default function Sidebar({ userName = "Aspirant" }) {
-  const { logout } = useAuth();
-  const navigate = useNavigate(); // ADD THIS
+export default function Sidebar() {
+  const { user, logout } = useAuth();  // ✅ Get the signed-in user's data
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const [openSubmenu, setOpenSubmenu] = useState(null);
 
+  // ✅ Derive username from Supabase user or Gmail name
+  const userName =
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split("@")[0] ||
+    "Aspirant";
   const toggleSidebar = () => setCollapsed(!collapsed);
   const handleMenuClick = (menu) =>
     setOpenMenu(openMenu === menu ? null : menu);
