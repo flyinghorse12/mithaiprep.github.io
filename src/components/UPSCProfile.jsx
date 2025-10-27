@@ -2,6 +2,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import supabase, { getProviderToken, saveFileMetadata } from "../supabase"; // note: supabase exports helper functions above
 // If your project structure differs, adjust the import path accordingly.
+import "../assets/scss/UPSCProfile.scss";
+
 
 const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
@@ -216,8 +218,8 @@ export default function UPSCProfile({ moduleName = "UPSC Profile", submoduleName
     }
   }
 
-  return (
-    <div style={{ padding: 18 }}>
+return (
+  <div className="upsc-profile">
       <h2>UPSC Profile</h2>
       <p>
         Files uploaded here are saved to your Google Drive under: <strong>{`MithaiPrep / ${moduleName}${submoduleName ? ' / ' + submoduleName : ''}`}</strong>
