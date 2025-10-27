@@ -21,9 +21,13 @@ export default function App() {
           path="/dashboard/*"
           element={
             <PrivateRoute>
-              <div style={{ display: "flex", minHeight: "100vh" }}>
+<div style={{ display: "flex", minHeight: "100vh", background: "#ffffff" }}>
+
                 <Sidebar />
-                <main style={{ flex: 1, padding: 20, background: "#f5f7fb" }}>
+  <main style={{ flex: 1, padding: 20, background: "#f5f7fb" }}>
+
+
+
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="planner" element={<Planner />} />
