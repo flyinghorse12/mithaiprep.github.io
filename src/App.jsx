@@ -21,10 +21,12 @@ export default function App() {
           path="/dashboard/*"
           element={
             <PrivateRoute>
-<div style={{ display: "flex", minHeight: "100vh", background: "#ffffff" }}>
+<div className="app-layout">
+  <div className="sidebar-container">
+    <Sidebar />
+  </div>
 
-                <Sidebar />
-<main style={{ flex: 1, padding: 20, background: '#ffffff' }}>
+  <main className="main-content">
 
 
 
