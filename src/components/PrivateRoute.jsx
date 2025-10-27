@@ -2,30 +2,24 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/GoogleAuthProvider";
 
-const PrivateRoute = ({ children }) => {
+export default function PrivateRoute({ children }) {
   const { user, initialLoading } = useAuth();
 
+  // Wait until session restoration completes
   if (initialLoading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          color: "white",
-          background:
-            "linear-gradient(120deg, rgba(113, 6, 191, 0.8), rgba(58, 0, 136, 0.8))",
-        }}
-      >
-        Checking existing session...
+      <div style={{ textAlign: "center", marginTop: "30vh", fontSize: "1.2rem" }}>
+        Loading your session...
       </div>
     );
   }
 
-  if (!user) return <Navigate to="/" replace />;
-  return children;
-};
+  // If no user after loading, redirect to login
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
-export default PrivateRoute;
+  // Otherwise, render protected content
+  return children;
+}
 
