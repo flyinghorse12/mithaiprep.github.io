@@ -1,0 +1,27 @@
+.study-ticker {
+  width: 100%;
+  background: linear-gradient(90deg, #ff4b2b, #ff416c);
+  color: white;
+  font-weight: 600;
+  padding: 8px 0;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+
+  .ticker-content {
+    display: inline-block;
+    white-space: nowrap;
+    animation: tickerMove 25s linear infinite;
+  }
+}
+
+@keyframes tickerMove {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+

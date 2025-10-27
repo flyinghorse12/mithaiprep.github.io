@@ -1,0 +1,22 @@
+/* Active timer sticky bar */
+.active-timer-bar {
+  width: 100%;
+  background: linear-gradient(90deg,#2b2b4f,#3a3a6a);
+  color: #fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 8px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 130;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.active-timer-bar .timer-left { display:flex; gap:12px; align-items:center; }
+.active-timer-bar .timer-center { font-family: "Courier New", monospace; font-size:1.1rem; color:#ffd27a; }
+.active-timer-bar .timer-controls { display:flex; gap:8px; }
+
+.btn.pause, .btn.resume { background:#ffb86c; color:#000; border-radius:8px; padding:6px 10px; }
+.btn.stop { background:#e63946; color:#fff; border-radius:8px; padding:6px 10px; }
+

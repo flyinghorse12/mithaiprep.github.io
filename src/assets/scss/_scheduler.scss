@@ -1,0 +1,88 @@
+/* src/assets/scss/_scheduler.scss */
+
+/* Overall tone */
+body, .google-study-planner {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  color: #fff;
+}
+
+/* Scheduler container */
+.study-planner-wrapper {
+  width: 100%;
+  display: block;
+  background: linear-gradient(180deg, rgba(27,27,47,0.6), rgba(37,37,64,0.6));
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+}
+
+/* dhtmlx-scheduler overrides for dark theme */
+.dhx_cal_container {
+  background: transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  border: none;
+}
+
+/* Header/title */
+.planner-container h2 {
+  color: #ffd27a;
+  margin-bottom: 12px;
+}
+
+/* active timer bar */
+.active-timer-bar {
+  width: 100%;
+  background: linear-gradient(90deg,#2b2b4f,#3a3a6a);
+  color: #fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 8px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 120;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 12px;
+}
+.active-timer-bar .left { font-weight: 600; }
+.active-timer-bar .center .timer { font-family: "Courier New", monospace; color: #ffd27a; font-weight:700; }
+.active-timer-bar .right button { margin-left: 8px; }
+
+/* planner layout */
+.planner-table-card {
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* dhtmlx specific classes */
+.dhx_cal_navline, .dhx_cal_header, .dhx_cal_data {
+  background: rgba(255,255,255,0.02) !important;
+}
+.dhx_cal_tab {
+  background: rgba(255,255,255,0.04) !important;
+  color: #fff !important;
+}
+.dhx_cal_tab.active {
+  background: #ffb86c !important;
+  color: #000 !important;
+}
+
+/* today highlight */
+.dhx_cal_today_button {
+  background: #ffb86c !important;
+  color: #000 !important;
+}
+
+/* events */
+.dhx_cal_event {
+  border-radius: 8px !important;
+  color: #000 !important;
+  padding: 6px !important;
+}
+
+/* responsive */
+@media (max-width: 1024px) {
+  .study-planner-wrapper { padding: 10px; }
+}
+

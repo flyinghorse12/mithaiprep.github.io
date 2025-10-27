@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UPSC Dashboard — NexusFlow</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+
+  <style>
+    :root {
+      --sidebar-width: 280px;
+      --sidebar-bg-1: #1a1c2e;
+      --sidebar-bg-2: #16181f;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto;
+      background: #f8f9fa;
+      overflow-x: hidden;
+    }
+
+    /* === SIDEBAR === */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: linear-gradient(135deg, var(--sidebar-bg-1) 0%, var(--sidebar-bg-2) 100%);
+      color: #a0a3bd;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.35s ease;
+      z-index: 2000;
+      overflow-y: auto;
+      padding-bottom: 1rem;
+    }
+
+    .sidebar.collapsed {
+      transform: translateX(-100%);
+    }
+
+    /* === TOGGLE BUTTON === */
+    .toggle-btn {
+      position: fixed;
+      top: 20px;
+      left: var(--sidebar-width);
+      background: #ffffff;
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      border: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 3000;
+      transition: left 0.35s ease, transform 0.3s ease;
+    }
+
+    .sidebar.collapsed + .toggle-btn {
+      left: 20px;
+    }
+
+    /* === LOGO SECTION === */
+    .logo-area {
+      padding: 1.25rem 1.25rem 0.75rem 1.25rem;
+    }
+
+    .logo-text {
+      background: linear-gradient(45deg, #6b8cff, #8b9fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .sidebar.collapsed .logo-text {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* === LINKS === */
+    .sidebar-link {
+      color: #a0a3bd;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 1.1rem;
+      margin: 2px 8px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .sidebar-link:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(3px);
+    }
+
+    .sidebar-link.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* === SUB LEVELS === */
+    .sub-item { padding-left: 2.25rem; font-size: 0.9rem; }
+    .sub-sub-item { padding-left: 3.75rem; font-size: 0.88rem; }
+
+    .chev {
+      margin-left: auto;
+      transition: transform 0.25s ease;
+      opacity: 0.9;
+    }
+    .rotate { transform: rotate(90deg); }
+
+    /* === PROFILE SECTION === */
+    .profile-section {
+      margin-top: auto;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1rem;
+    }
+
+    .profile-info {
+      color: #e6e8f2;
+      margin-left: 0.75rem;
+    }
+
+    /* === MAIN CONTENT === */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      transition: margin-left 0.35s ease;
+      padding: 2rem;
+    }
+
+    .sidebar.collapsed ~ .main-content {
+      margin-left: 0;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      .toggle-btn {
+        left: 20px;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="logo-area">
+      <h4 class="logo-text">NexusFlow</h4>
+      <p class="text-muted small mb-0">UPSC Prep Dashboard</p>
+    </div>
+
+    <div class="nav flex-column" id="sidebarNav">
+      <a href="#" class="sidebar-link"><i class="fas fa-user-graduate"></i> UPSC Profile</a>
+      <a href="#" class="sidebar-link"><i class="fas fa-calendar-alt"></i> Calendar</a>
+      <a href="#" class="sidebar-link"><i class="fas fa-book"></i> Syllabus</a>
+
+      <!-- GS Modules -->
+      <a class="sidebar-link d-flex align-items-center" data-bs-toggle="collapse" href="#gsMenu" role="button">
+        <i class="fas fa-lightbulb"></i> GS Modules
+        <i class="fas fa-chevron-right chev"></i>
+      </a>
+      <div class="collapse" id="gsMenu">
+        <a href="#" class="sidebar-link sub-item">Quantitative</a>
+        <a href="#" class="sidebar-link sub-item">Aptitude</a>
+        <a href="#" class="sidebar-link sub-item">Qualitative</a>
+      </div>
+
+      <!-- Region -->
+      <a class="sidebar-link d-flex align-items-center" data-bs-toggle="collapse" href="#regionMenu" role="button">
+        <i class="fas fa-globe-asia"></i> Region
+        <i class="fas fa-chevron-right chev"></i>
+      </a>
+      <div class="collapse" id="regionMenu">
+        <!-- India -->
+        <a class="sidebar-link sub-item d-flex align-items-center" data-bs-toggle="collapse" href="#indiaMenu">
+          <i class="fas fa-circle"></i> India <i class="fas fa-chevron-right chev"></i>
+        </a>
+        <div class="collapse" id="indiaMenu">
+          <a href="#" class="sidebar-link sub-sub-item">History</a>
+          <a href="#" class="sidebar-link sub-sub-item">Geography</a>
+          <a href="#" class="sidebar-link sub-sub-item">Polity</a>
+        </div>
+
+        <!-- Kolkata -->
+        <a class="sidebar-link sub-item d-flex align-items-center" data-bs-toggle="collapse" href="#kolkataMenu">
+          <i class="fas fa-circle"></i> Kolkata <i class="fas fa-chevron-right chev"></i>
+        </a>
+        <div class="collapse" id="kolkataMenu">
+          <a href="#" class="sidebar-link sub-sub-item">History</a>
+          <a href="#" class="sidebar-link sub-sub-item">Geography</a>
+          <a href="#" class="sidebar-link sub-sub-item">Polity</a>
+          <a href="#" class="sidebar-link sub-sub-item">YouTube Videos</a>
+        </div>
+
+        <!-- West Bengal -->
+        <a class="sidebar-link sub-item d-flex align-items-center" data-bs-toggle="collapse" href="#wbMenu">
+          <i class="fas fa-circle"></i> West Bengal <i class="fas fa-chevron-right chev"></i>
+        </a>
+        <div class="collapse" id="wbMenu">
+          <a href="#" class="sidebar-link sub-sub-item">History</a>
+          <a href="#" class="sidebar-link sub-sub-item">Geography</a>
+          <a href="#" class="sidebar-link sub-sub-item">Polity</a>
+          <a href="#" class="sidebar-link sub-sub-item">YouTube Videos</a>
+        </div>
+      </div>
+
+      <!-- Religion -->
+      <a class="sidebar-link d-flex align-items-center" data-bs-toggle="collapse" href="#religionMenu">
+        <i class="fas fa-place-of-worship"></i> Religion <i class="fas fa-chevron-right chev"></i>
+      </a>
+      <div class="collapse" id="religionMenu">
+        <a class="sidebar-link sub-item d-flex align-items-center" data-bs-toggle="collapse" href="#hinduMenu">
+          <i class="fas fa-circle"></i> Hindu <i class="fas fa-chevron-right chev"></i>
+        </a>
+        <div class="collapse" id="hinduMenu">
+          <a href="#" class="sidebar-link sub-sub-item">Geography</a>
+          <a href="#" class="sidebar-link sub-sub-item">Fact & Figure</a>
+        </div>
+
+        <a class="sidebar-link sub-item d-flex align-items-center" data-bs-toggle="collapse" href="#nonhinduMenu">
+          <i class="fas fa-circle"></i> Non-Hindu <i class="fas fa-chevron-right chev"></i>
+        </a>
+        <div class="collapse" id="nonhinduMenu">
+          <a href="#" class="sidebar-link sub-sub-item">Geography</a>
+          <a href="#" class="sidebar-link sub-sub-item">Fact & Figure</a>
+        </div>
+      </div>
+
+      <!-- People -->
+      <a class="sidebar-link d-flex align-items-center" data-bs-toggle="collapse" href="#peopleMenu">
+        <i class="fas fa-users"></i> People <i class="fas fa-chevron-right chev"></i>
+      </a>
+      <div class="collapse" id="peopleMenu">
+        <a href="#" class="sidebar-link sub-item">Ancient</a>
+        <a href="#" class="sidebar-link sub-item">Medieval</a>
+        <a href="#" class="sidebar-link sub-item">Modern</a>
+      </div>
+
+      <a href="#" class="sidebar-link"><i class="fas fa-layer-group"></i> More / Upcoming</a>
+    </div>
+
+    <!-- Profile -->
+    <div class="profile-section d-flex align-items-center">
+      <img src="https://randomuser.me/api/portraits/men/65.jpg" class="rounded-circle" style="width:56px;height:56px;" alt="Profile" />
+      <div class="profile-info">
+        <h6 class="mb-0">Alex Morgan</h6>
+        <small class="text-muted">Admin</small>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Toggle Button -->
+  <button class="toggle-btn" id="sidebarToggle"><i class="fas fa-chevron-left"></i></button>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container-fluid">
+      <h2 class="fw-semibold mb-3">Welcome — UPSC Preparation Dashboard</h2>
+      <p class="text-muted">Organized access to all UPSC study modules and subtopics.</p>
+      <div class="card shadow-sm mt-3">
+        <div class="card-body">
+          <h5 class="card-title">Instructions</h5>
+          <ul>
+            <li>Click <strong>›</strong> to expand modules.</li>
+            <li>Click the left chevron button to hide or show the sidebar.</li>
+            <li>Replace links with your dynamic routes or pages.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      const ic = toggleBtn.querySelector('i');
+      if (sidebar.classList.contains('collapsed')) {
+        ic.style.transform = 'rotate(180deg)';
+        toggleBtn.style.left = '20px';
+      } else {
+        ic.style.transform = 'rotate(0deg)';
+        toggleBtn.style.left = 'var(--sidebar-width)';
+      }
+    });
+
+    // Chevron rotation on collapse toggle
+    document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(el => {
+      el.addEventListener('click', () => {
+        const target = document.querySelector(el.getAttribute('href'));
+        const chev = el.querySelector('.chev');
+        setTimeout(() => {
+          chev && chev.classList.toggle('rotate', target.classList.contains('show'));
+        }, 200);
+      });
+    });
+  </script>
+</body>
+</html>
+

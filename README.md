@@ -1,1 +1,4 @@
+<<<<<<< HEAD
 # Mithaiprep MERN Project
+=======
+

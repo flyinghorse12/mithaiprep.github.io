@@ -1,0 +1,40 @@
+/* src/assets/scss/_plannerTable.scss */
+
+.planner-table {
+  display: block;
+  font-size: 0.95rem;
+
+  h3 { margin: 0; font-size: 1.1rem; color: #111827; }
+  .export-btn {
+    background: linear-gradient(90deg,#4f46e5,#3b82f6);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+
+    th {
+      background: #f3f4f6;
+      color: #374151;
+      padding: 8px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #111827;
+    }
+    tr:hover { background: #fbfdff; }
+  }
+
+  button { padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; }
+}
+

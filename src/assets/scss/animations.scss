@@ -1,0 +1,12 @@
+@keyframes purple-glow {
+  0% {
+    box-shadow: 0 0 15px rgba(113, 6, 191, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(181, 124, 255, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(113, 6, 191, 0.5);
+  }
+}
+
