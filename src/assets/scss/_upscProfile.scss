@@ -21,18 +21,16 @@ body {
 }
 
 /* === Main layout === */
-main {
-  flex: 1 1 0%;
+main.upsc-main-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 40px;
   background: #f5f7fb;
+  min-height: 100vh;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
   box-sizing: border-box;
 }
-
 /* === UPSC Profile Container === */
 .upsc-profile-container {
   width: 100%;

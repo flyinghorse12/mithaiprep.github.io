@@ -7,7 +7,6 @@ const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
 
 /* ---------- Drive helpers ---------- */
-
 async function findFolder(accessToken, name, parentId = null) {
   const q = parentId
     ? `mimeType='application/vnd.google-apps.folder' and name='${name.replace(/'/g, "\\'")}' and '${parentId}' in parents and trashed=false`
@@ -85,7 +84,6 @@ async function listFilesInFolder(accessToken, folderId) {
 }
 
 /* ---------- Component ---------- */
-
 export default function UPSCProfile({ moduleName = "UPSC Profile", submoduleName = "" }) {
   const [user, setUser] = useState(null);
   const [folderPath, setFolderPath] = useState("");
@@ -162,8 +160,8 @@ export default function UPSCProfile({ moduleName = "UPSC Profile", submoduleName
   }
 
   return (
-    <div className="upsc-profile-container">
-      <div className="upsc-profile">
+    <main className="upsc-profile-wrapper">
+      <div className="upsc-profile-container">
         <h2>UPSC Profile</h2>
         <p>
           Files uploaded here are saved to your Google Drive under:{" "}
@@ -196,7 +194,7 @@ export default function UPSCProfile({ moduleName = "UPSC Profile", submoduleName
           <div className="status-text">{status}</div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
