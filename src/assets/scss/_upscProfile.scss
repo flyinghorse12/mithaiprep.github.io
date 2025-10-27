@@ -19,7 +19,16 @@ body {
   width: 100%;
   min-height: 100vh;
 }
-
+.upsc-profile-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  width: 100%;
+  background: #f5f7fb;
+  padding: 50px 20px;
+  box-sizing: border-box;
+}
 /* === Main layout === */
 main.upsc-main-layout {
   display: flex;
