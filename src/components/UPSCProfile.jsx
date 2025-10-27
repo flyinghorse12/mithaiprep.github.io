@@ -1,7 +1,7 @@
 // src/components/UPSCProfile.jsx
 import React, { useEffect, useRef, useState } from "react";
 import supabase, { getProviderToken, saveFileMetadata } from "../supabase";
-import "../assets/scss/UPSCProfile.scss";
+import "../assets/scss/_upscProfile.scss";
 
 const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
