@@ -24,7 +24,8 @@ export default function App() {
 <div style={{ display: "flex", minHeight: "100vh", background: "#ffffff" }}>
 
                 <Sidebar />
-  <main style={{ flex: 1, padding: 20, background: '#ffffff" }}>
+<main style={{ flex: 1, padding: 20, background: '#ffffff' }}>
+
 
 
 
