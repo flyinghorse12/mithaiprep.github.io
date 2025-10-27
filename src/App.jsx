@@ -1,12 +1,13 @@
 // src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "./components/Sidebar";
+import Dashboard from "./components/Dashboard";
 import UPSCProfile from "./components/UPSCProfile";
 
 // Placeholder components — replace these imports with your actual components if filenames differ
 import Login from "./components/Login";
-import Dashboard from "./Dashboard";
+
 import Planner from "./components/StudyPlanner";
 import PrivateRoute from "./components/PrivateRoute"; // keep if you have it
 
