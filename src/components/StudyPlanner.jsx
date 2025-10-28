@@ -149,7 +149,6 @@ export default function StudyPlanner({ sidebarCollapsed = false }) {
     };
 
     const onDelete = async (id) => {
-      // prevent numeric IDs (temporary) from deleting
       if (typeof id !== "string" || id.length < 10) {
         scheduler.deleteEvent(id);
         return;
@@ -181,23 +180,26 @@ export default function StudyPlanner({ sidebarCollapsed = false }) {
   }, [userId]);
 
   return (
-    <div className={`study-planner-root ${sidebarCollapsed ? "collapsed" : ""}`}>
-      <div className="study-planner-inner">
-        <div className="studyplanner-left">
-          <div id="scheduler_here" ref={containerRef} className="dhx_cal_container" />
+    <div className="scheduler-page">
+      <div className="scheduler-content">
+        <div className={`study-planner-root ${sidebarCollapsed ? "collapsed" : ""}`}>
+          <div className="study-planner-inner">
+            <div className="studyplanner-left">
+              <div id="scheduler_here" ref={containerRef} className="dhx_cal_container" />
+            </div>
+            <aside className="studyplanner-right">
+              <PlannerTable reloadKey={reloadKey} />
+            </aside>
+          </div>
+          <PomodoroCard
+            selectedEvent={selectedEvent}
+            onSessionSaved={() => {
+              setSelectedEvent(null);
+              loadEvents();
+            }}
+          />
         </div>
-        <aside className="studyplanner-right">
-          <PlannerTable reloadKey={reloadKey} />
-        </aside>
       </div>
-
-      <PomodoroCard
-        selectedEvent={selectedEvent}
-        onSessionSaved={() => {
-          setSelectedEvent(null);
-          loadEvents();
-        }}
-      />
     </div>
   );
 }
