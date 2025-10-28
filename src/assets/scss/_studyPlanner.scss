@@ -4,7 +4,7 @@
 
 .study-planner-root {
   width: calc(100vw - 280px);
-  padding: 20px;
+padding: 20px 20px 20px 0; /* Remove padding on the left */ 
   box-sizing: border-box;
   height: calc(100vh - 64px);
   transition: width 0.3s ease;
